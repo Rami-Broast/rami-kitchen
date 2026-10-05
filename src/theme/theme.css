@@ -1,0 +1,211 @@
+/*
+ * The Branch POS palette.
+ *
+ * This screen is on a counter for a whole shift, under shop lighting, read at
+ * arm's length by someone holding a bag. Two things follow from that and they
+ * are why this file changed.
+ *
+ * **The ground is a warm neutral, not a tint.** It used to be `#f6eef3` with
+ * pink-tinted borders to match the brand, so every surface, rule and card edge
+ * carried the magenta. A brand colour is worth having where it means something
+ * — the primary action — and is noise everywhere else. Food photography and
+ * order text both sit better on neutral.
+ *
+ * **It is pinned light.** There was a `prefers-color-scheme: dark` block, so a
+ * counter machine that happened to be set to dark mode ran the whole shift in
+ * dark purple — a palette nobody art-directed, chosen by an OS setting no one
+ * at the branch knows they set. Same decision the customer app made.
+ */
+:root {
+  color-scheme: light;
+
+  --bg: #f4f3f1;
+  --surface: #ffffff;
+  --surface-2: #f7f6f4;
+  --surface-3: #eeece9;
+  --border: #e2dfdb;
+  /* A hairline for inside a card, where a full border would be a second box. */
+  --border-soft: #efedea;
+  --text: #1c1a19;
+  --text-muted: #6d6862;
+
+  /*
+   * The action colour is a warm near-black, not the brand magenta.
+   *
+   * A board carries four or five primary buttons at once — accept, ready,
+   * complete, print — and in saturated magenta they compete with each other and
+   * with the status pills that are actually trying to signal something. Dark
+   * buttons recede into the layout and let colour mean "look here".
+   */
+  --primary: #24201e;
+  --primary-hover: #35302c;
+  --on-primary: #ffffff;
+
+  /*
+   * The brand, deliberately rationed: the current section in the nav, and
+   * nothing else. One magenta element per screen reads as identity; six reads
+   * as decoration.
+   */
+  --brand: #752E2A;
+  --brand-soft: #F6ECE6;
+
+  --accent: #2f6bd6;
+  --success: #1c8b4f;
+  --success-soft: #e8f5ee;
+  --warning: #a86410;
+  --warning-soft: #fbf1e2;
+  --danger: #bd3025;
+  --danger-soft: #fbecea;
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  /*
+   * Two shadows, not one. A card lifted the same amount as a modal flattens the
+   * hierarchy, and on a board of twenty order cards a heavy shadow each turns
+   * into grey mush.
+   */
+  --shadow: 0 1px 2px rgba(28, 26, 25, 0.04), 0 1px 3px rgba(28, 26, 25, 0.06);
+  --shadow-lg: 0 4px 12px rgba(28, 26, 25, 0.08), 0 16px 40px rgba(28, 26, 25, 0.12);
+
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  background: var(--primary);
+  color: var(--on-primary);
+  /* Counter staff tap these hundreds of times a shift; the press should be felt
+     without being a bounce. */
+  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+}
+.btn:hover:not(:disabled) { background: var(--primary-hover); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.secondary {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+.btn.secondary:hover:not(:disabled) { background: var(--surface-2); }
+/* The current section. The one place the brand colour appears. */
+.btn.brand { background: var(--brand); color: #fff; }
+.btn.brand:hover:not(:disabled) { background: #5E2421; }
+.btn.ghost { background: transparent; color: var(--text-muted); }
+.btn.ghost:hover:not(:disabled) { background: var(--surface-2); color: var(--text); }
+/* Rejecting an order is destructive and rare. An outline keeps it reachable
+   without putting a red block beside every accept button all shift. */
+.btn.danger {
+  background: var(--surface);
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn.danger:hover:not(:disabled) { background: var(--danger-soft); }
+.btn.block { display: block; width: 100%; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+/*
+ * An order card on the board.
+ *
+ * The status stripe is a **tonal accent**, set per card by whatever renders it,
+ * rather than the brand magenta on every single one. Twenty identical magenta
+ * stripes carry no information; a stripe that means "this one is late" does.
+ */
+.card.tile {
+  padding: 14px;
+  border-inline-start: 3px solid var(--tile-accent, var(--border));
+  transition: box-shadow 140ms ease, border-color 140ms ease;
+}
+.card.tile:hover { box-shadow: var(--shadow-lg); }
+
+/*
+ * A board column. The heading stays put while the orders under it scroll, so a
+ * cook glancing up mid-service still knows which list they are looking at.
+ */
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.column-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 2px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+.column-count {
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--text-muted);
+  background: var(--surface-3);
+  border-radius: 999px;
+  padding: 1px 9px;
+}
+
+.input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 15px;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(47, 107, 214, 0.15);
+}
+
+.muted { color: var(--text-muted); }
+.mono { font-variant-numeric: tabular-nums; }
+.pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+/*
+ * Tonal status pills: a coloured word on its own soft ground, rather than white
+ * text on a saturated block. Twenty saturated blocks on one board is a hazard
+ * light display; these stay readable in a row and still separate at a glance.
+ */
+.pill.tone-new { background: var(--warning-soft); color: var(--warning); }
+.pill.tone-ok { background: var(--success-soft); color: var(--success); }
+.pill.tone-bad { background: var(--danger-soft); color: var(--danger); }
+.pill.tone-quiet { background: var(--surface-3); color: var(--text-muted); }
